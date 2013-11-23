@@ -19,7 +19,7 @@ Version 1.00
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 
 =head1 SYNOPSIS
@@ -143,11 +143,11 @@ sub new {
 	#
 	# process user arguments.
 	#
-	if (! defined $user_args{'file_name'} || ! defined @{$user_args{'fields'}}) {
+	if (! defined $user_args{'file_name'} || ! defined $user_args{'fields'}[0]) {
 		die "Define file_name and fields variables";
 									# Just die if mandatory variables are not provided.
 	}
-	test_unique_fields(@{$user_args{'fields'}});
+	_test_unique_fields(@{$user_args{'fields'}});
 									# Make sure all the titles are unique.
 	my $location = ((defined $user_args{'location'}) ? ($user_args{'location'}) : ('.'));
 									# This is the location to create user data table.
@@ -182,43 +182,40 @@ sub new {
 						};
 
 	#
-	# Create data file.
+	# Create data file. Do not create a new file if append is enabled.
 	#
-	create_file($data_table_ref);
+	unless (defined $data_table_ref->{'append'} && $data_table_ref->{'append'} == 1 && -f $data_table_ref->{'l_o_f'}) {
+		my ($pattern, @entry);
+
+		#
+		# Open the new file in write mode.
+		#
+		open(DT, ">" , $data_table_ref->{'l_o_f'}) or _die($data_table_ref, "Failed to create a data table file $!");
+		@entry = @{$data_table_ref->{'fields'}};
+		
+		#
+		# Create and print the pattern.
+		#
+		foreach (0 .. $#entry) {
+			if ($_ == $#entry) {
+				$pattern = $pattern . sprintf ( "%-$data_table_ref->{column_width}s \n", $entry[$_]);
+			} else {
+				$pattern = $pattern . sprintf ( "%-$data_table_ref->{column_width}s $data_table_ref->{delimiter} ", $entry[$_]);
+			}
+		}
+		print DT $pattern;
+
+		#
+		# Close the opened file.
+		#
+		close(DT);
+	}
 
 	#
 	# blessing the class.
 	#
 	bless($data_table_ref);
 	return $data_table_ref;
-}
-
-
-#
-# Internal method:
-# create_file()
-#	Create a file based on users specification.
-#
-sub create_file {
-	my $this = shift;
-
-	#
-	# Do not create a new file if append is enabled.
-	#
-	if (defined $this->{'append'} && $this->{'append'} == 1 && -f $this->{'l_o_f'}) {
-		return 0;
-	}
-
-	#
-	# Open the new file in write mode.
-	#
-	open(DT, ">" , $this->{'l_o_f'}) or _die($this, "Failed to create a data table file $!");
-	print DT create_pattern($this, @{$this->{'fields'}});
-
-	#
-	# Close the opened file.
-	#
-	close(DT);
 }
 
 =head2 $foo_data_table->add_entry(@data_records)
@@ -239,6 +236,7 @@ creates the entry, it will return 0.
 sub add_entry {
 	my $this = shift;
 	my @entry = @_;
+	my $pattern;
 
 	#
 	# Sanity test on users provided data.
@@ -249,7 +247,22 @@ sub add_entry {
 	# Open the data base table and add the entry.
 	#
 	open(DT, ">>" , $this->{l_o_f}) or _die($this, "Failed to create a data table file $!");
-	print DT create_pattern($this, @entry);
+
+	#
+	# Create the pattern.
+	#
+	foreach (0 .. $#entry) {
+		if ($_ == $#entry) {
+			$pattern = $pattern . sprintf ( "%-$this->{column_width}s \n", $entry[$_]);
+		} else {
+			$pattern = $pattern . sprintf ( "%-$this->{column_width}s $this->{delimiter} ", $entry[$_]);
+		}
+	}
+
+	#
+	# Print the pattern.
+	#
+	print DT $pattern;
 
 	#
 	# Close the opened file.
@@ -619,10 +632,10 @@ sub create_pattern {
 
 #
 # Internal method:
-# test_unique_fields()
+# _test_unique_fields()
 #	All fields must be unique.
 #
-sub test_unique_fields {
+sub _test_unique_fields {
 	my @fields = @_;
 	my $count = 0;
 	my $pattern;
@@ -663,18 +676,6 @@ sub _die {
 #
 sub DESTROY {
 	my $this = shift;
-}
-
-
-
-sub function1 {
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
 }
 
 =head1 AUTHOR

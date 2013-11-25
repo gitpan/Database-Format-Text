@@ -19,7 +19,7 @@ Version 1.00
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 
 =head1 SYNOPSIS
@@ -605,29 +605,6 @@ sub get_titles {
 	# Close the opened file.
 	close(DT);
 	return @all_fields;				# return all the titles.
-}
-
-#
-# Internal method:
-# create_pattern()
-#	Creating pattern to be recorded as in the database.
-#
-sub create_pattern {
-	my $this = shift;
-	my @entry = @_;
-	my $pattern;
-
-	#
-	# Create the pattern.
-	#
-	foreach (0 .. $#entry) {
-		if ($_ == $#entry) {
-			$pattern = $pattern . sprintf ( "%-$this->{column_width}s \n", $entry[$_]);
-		} else {
-			$pattern = $pattern . sprintf ( "%-$this->{column_width}s $this->{delimiter} ", $entry[$_]);
-		}
-	}
-	return $pattern;
 }
 
 #

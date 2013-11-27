@@ -1,6 +1,6 @@
 package Database::Format::Text;
 
-# Use tab 4 to view at its best :).
+# Use tab width 8 to view at its best :).
 
 use 5.006;
 use strict;
@@ -15,11 +15,11 @@ Database::Format::Text - Local database in text format.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.03
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 
 =head1 SYNOPSIS
@@ -55,7 +55,7 @@ entry. Following is the example to use C<Database::Format::Text>
 
 	# Create database
 	my $foo_data_table = Database::Format::Text->new('file_name' => "foo_data", 
-													 'fields' => \@titles);
+							 'fields' => \@titles);
 	# Add entry
 	my $status = $foo_data_table->add_entry("1", "Test1", "Pass", "Applicable");
 
@@ -90,7 +90,7 @@ Creates and returns a new Database::Format::Text object.
 	my @titles = qw(Number Title Status Comments [ . . .]);
 						# User can add N number of columns here.
 	my $foo_data_table = Database::Format::Text->new('file_name' => "foo_data", 
-													 'fields' => \@titles);
+							 'fields' => \@titles);
 
 Constructor needs 2 parameters. Without above 2 parameters program will die. 2 
 parameters are file name and titles for database. File name is required to store 
@@ -145,41 +145,41 @@ sub new {
 	#
 	if (! defined $user_args{'file_name'} || ! defined $user_args{'fields'}[0]) {
 		die "Define file_name and fields variables";
-									# Just die if mandatory variables are not provided.
+						# Just die if mandatory variables are not provided.
 	}
 	_test_unique_fields(@{$user_args{'fields'}});
-									# Make sure all the titles are unique.
+						# Make sure all the titles are unique.
 	my $location = ((defined $user_args{'location'}) ? ($user_args{'location'}) : ('.'));
-									# This is the location to create user data table.
+						# This is the location to create user data table.
 	my $delimiter = ((defined $user_args{'delimiter'}) ? ($user_args{'delimiter'}) : (':'));
-									# This will separate each records in data table.
+						# This will separate each records in data table.
 	my $append = ((defined $user_args{'append'}) ? ($user_args{'append'}) : (0));
-									# If enable do not delete all data table.
+						# If enable do not delete all data table.
 	my $column_width = ((defined $user_args{'column_width'}) ? ($user_args{'column_width'}) : (10));
-									# This will produce uniform output in the data table.
+						# This will produce uniform output in the data table.
 	my $l_o_f = $location . "/" . $user_args{'file_name'};
-									# The complete location to file.
+						# The complete location to file.
 	$l_o_f = File::Spec->canonpath($l_o_f);
-									# User can use this on Linux as well as on Windows.
+						# User can use this on Linux as well as on Windows.
 	my $die = ((defined $user_args{'die'}) ? ($user_args{'die'}) : 1);
-									# Script will die out if enable
+						# Script will die out if enable
 	my $f_c = @{$user_args{'fields'}};
-									# Variable to provide sanity.
+						# Variable to provide sanity.
 
 	#
 	# The hash reference is created.
 	#
 	my $data_table_ref = {
-							'file_name' => $user_args{'file_name'},
-							'fields' => \@{$user_args{'fields'}},
-							'location' => $location,
-							'delimiter' => $delimiter,
-							'append' => $append,
-							'column_width' => $column_width,
-							'die' => $die,
-							'l_o_f' => $l_o_f,
-							'f_c' => $f_c,
-						};
+				'file_name' => $user_args{'file_name'},
+				'fields' => \@{$user_args{'fields'}},
+				'location' => $location,
+				'delimiter' => $delimiter,
+				'append' => $append,
+				'column_width' => $column_width,
+				'die' => $die,
+				'l_o_f' => $l_o_f,
+				'f_c' => $f_c,
+				};
 
 	#
 	# Create data file. Do not create a new file if append is enabled.
@@ -293,11 +293,11 @@ and return 5.
 sub delete_entry {
 	my $this = shift;
 	my $field_name = shift;			# Title.
-	my $record = shift;				# Record needs manipulation.
-	my @all_fields;					# Holds all the titles.
-	my @database_line;				# Holds data table lines.
+	my $record = shift;			# Record needs manipulation.
+	my @all_fields;				# Holds all the titles.
+	my @database_line;			# Holds data table lines.
 	my $given_field_index;			# Index of the titles to the @all_fields.
-	my $count = 0;					# Counts the number of entries deleted.
+	my $count = 0;				# Counts the number of entries deleted.
 
 	#
 	# Open database file to read titles.
@@ -357,9 +357,9 @@ sub delete_entry {
 		if ($_ =~ m/$record/) {
 			@database_line = split(/$this->{'delimiter'}/, $_);
 			map { s/^\s*(\w*.*\w)\s*$/$1/ } @database_line;
-										# Remove trailing and heading white spaces.
+						# Remove trailing and heading white spaces.
 			map { s/^\s+$/ / } @database_line;
-										# Remove multiple spaces.
+						# Remove multiple spaces.
 			if ($database_line[$given_field_index] eq $record) {
 				++$count; 
 				next;
@@ -378,7 +378,7 @@ sub delete_entry {
 	# Delete the temporary file.
 	#
 	unlink(".tmp");
-	return $count;						# $return will hold count for deletion happened.
+	return $count;				# $return will hold count for deletion happened.
 }
 
 =head2 $foo_data_table->count_entry($title, $record)
@@ -402,9 +402,9 @@ sub count_entry {
 	my $this = shift;
 	my $count = 0;
 	my $field_name = shift;			# Title.
-	my $record = shift;				# Record needs manipulation.
-	my @all_fields;					# Holds all the titles.
-	my @database_line;				# Holds data table lines.
+	my $record = shift;			# Record needs manipulation.
+	my @all_fields;				# Holds all the titles.
+	my @database_line;			# Holds data table lines.
 	my $given_field_index;			# Index of the titles to the @all_fields.
 
 	#
@@ -442,9 +442,9 @@ sub count_entry {
 		if ($_ =~ m/$record/) {
 			@database_line = split(/$this->{'delimiter'}/, $_);
 			map { s/^\s*(\w*.*\w)\s*$/$1/ } @database_line;
-										# Remove trailing and heading white spaces.
+						# Remove trailing and heading white spaces.
 			map { s/^\s+$/ / } @database_line;
-										# Remove multiple spaces.
+						# Remove multiple spaces.
 			if ($database_line[$given_field_index] eq $record) {
 				++$count;
 			}
@@ -481,14 +481,14 @@ This will return value stored under "Status" whose "Number" is 7.
 
 sub get_entry {
 	my $this = shift;
-	my $field_name = shift;				# Title.
-	my $record = shift;					# Record needs manipulation.
+	my $field_name = shift;			# Title.
+	my $record = shift;			# Record needs manipulation.
 	my $specific_field = shift if @_;	# Query title.
-	my @all_fields;						# Holds all the titles.
-	my @database_line;					# Holds data table lines.
-	my $given_field_index;				# Index of the titles to the @all_fields.
-	my $searching_field_index;			# Index of the titles to the @all_fields.
-	my @record_found;					# Holds matched pattern.
+	my @all_fields;				# Holds all the titles.
+	my @database_line;			# Holds data table lines.
+	my $given_field_index;			# Index of the titles to the @all_fields.
+	my $searching_field_index;		# Index of the titles to the @all_fields.
+	my @record_found;			# Holds matched pattern.
 
 	#
 	# Open database file.
@@ -535,9 +535,9 @@ sub get_entry {
 		if ($_ =~ m/$record/) {
 			@database_line = split(/$this->{'delimiter'}/, $_);
 			map { s/^\s*(\w*.*\w)\s*$/$1/ } @database_line;
-									# Remove trailing and heading white spaces.
+						# Remove trailing and heading white spaces.
 			map { s/^\s+$/ / } @database_line;
-									# Remove multiple spaces.
+						# Remove multiple spaces.
 			push (@record_found, @database_line) if ($database_line[$given_field_index] eq $record);
 			return ($database_line[$searching_field_index]) if (defined $specific_field && $database_line[$given_field_index] eq $record);
 		}
@@ -556,7 +556,7 @@ in list.
 
 sub get_table {
 	my $this = shift;
-	my @database_lines;				# This will hold all the records.
+	my @database_lines;			# This will hold all the records.
 
 	#
 	# Open database file in read mode and read the entire file.
@@ -584,7 +584,7 @@ of the database.
 
 sub get_titles {
 	my $this = shift;
-	my @all_fields;					# Holds all the titles.
+	my @all_fields;				# Holds all the titles.
 
 	#
 	# Open database file.
@@ -604,7 +604,7 @@ sub get_titles {
 	#
 	# Close the opened file.
 	close(DT);
-	return @all_fields;				# return all the titles.
+	return @all_fields;			# return all the titles.
 }
 
 #

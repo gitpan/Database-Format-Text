@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Database-Format-Text
-version:            1.02
+version:            1.03
 abstract:           Local database in text format.
 author:
     - Devang Doshi <devdos@cpan.org>
